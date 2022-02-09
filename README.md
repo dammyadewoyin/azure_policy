@@ -1,2 +1,2 @@
 # azure_policy
-Holds a few tested custom policies 
+A few custom policies
