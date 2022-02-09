@@ -1,0 +1,27 @@
+{
+  "mode": "Indexed",
+  "policyRule": {
+    "if": {
+      "allOf": [
+        {
+          "field": "type",
+          "equals": "Microsoft.DocumentDB/databaseAccounts"
+        },
+        {
+          "field": "Microsoft.DocumentDB/databaseAccounts/publicNetworkAccess",
+          "notEquals": "disabled"
+        }
+      ]
+    },
+    "then": {
+      "effect": "append",
+      "details": [
+        {
+          "field": "Microsoft.DocumentDB/databaseAccounts/publicNetworkAccess",
+          "value": "disabled"
+        }
+      ]
+    }
+  },
+  "parameters": {}
+}
