@@ -1,0 +1,33 @@
+{
+  "mode": "Indexed",
+  "policyRule": {
+    "if": {
+      "allOf": [
+        {
+          "field": "type",
+          "equals": "Microsoft.Sql/servers"
+        },
+        {
+          "value": "[resourceGroup().name]",
+          "notLike": "*-MRG"
+        },
+        {
+          "anyOf": [
+            {
+              "field": "Microsoft.Sql/servers/minimalTlsVersion",
+              "exists": false
+            },
+            {
+              "field": "Microsoft.Sql/servers/minimalTlsVersion",
+              "notEquals": "1.2"
+            }
+          ]
+        }
+      ]
+    },
+    "then": {
+      "effect": "deny"
+    }
+  },
+  "parameters": {}
+}
