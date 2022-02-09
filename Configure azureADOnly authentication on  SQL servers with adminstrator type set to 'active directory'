@@ -1,0 +1,77 @@
+{
+  "mode": "All",
+  "policyRule": {
+    "if": {
+      "allOf": [
+        {
+          "field": "type",
+          "equals": "Microsoft.Sql/servers"
+        },
+        {
+          "field": "Microsoft.Sql/servers/administrators.administratorType",
+          "equals": "activeDirectory"
+        }
+      ]
+    },
+    "then": {
+      "effect": "[parameters('effect')]",
+      "details": {
+        "type": "Microsoft.Sql/servers/azureADOnlyAuthentications",
+        "existenceCondition": {
+          "allOf": [
+            {
+              "field": "Microsoft.Sql/servers/azureADOnlyAuthentications/azureADOnlyAuthentication",
+              "exists": true
+            },
+            {
+              "field": "Microsoft.Sql/servers/azureADOnlyAuthentications/azureADOnlyAuthentication",
+              "equals": true
+            }
+          ]
+        },
+        "roleDefinitionIds": [
+          "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+        ],
+        "deployment": {
+          "properties": {
+            "mode": "incremental",
+            "parameters": {
+              "serverName": {
+                "value": "[field('fullName')]"
+              }
+            },
+            "template": {
+              "$schema": http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#,
+              "contentVersion": "1.0.0.0",
+              "parameters": {
+                "serverName": {
+                  "type": "string"
+                }           
+              },
+              "resources": [
+                {
+                  "type": "Microsoft.Sql/servers/azureADOnlyAuthentications",
+                  "apiVersion": "2020-02-02-preview",
+                  "name": "[concat(parameters('serverName'), '/Default')]",
+                  "properties": {
+                    "azureADOnlyAuthentication": true
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "parameters": {
+    "effect": {
+      "type": "String",
+      "metadata": {
+        "displayName": "Effect",
+        "description": "The effect determines what happen when the policy rule is evaluated to match"
+      },
+      "defaultValue": "deployIfNotExists"
+    }
+  }
+}
