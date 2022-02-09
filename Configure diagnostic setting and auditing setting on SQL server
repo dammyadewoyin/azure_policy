@@ -1,0 +1,106 @@
+{ 
+    "mode": "Indexed",
+    "parameters": {
+      "workspaceId": {
+        "type": "String",
+        "metadata": {
+          "displayName": "workspaceId",
+          "description": "Log AnalyticsID"
+        }
+      }
+    },
+    "policyRule": {
+      "if": {
+        "field": "type",
+        "equals": "Microsoft.Sql/servers"
+      },
+      "then": {
+        "effect": "deployIfNotExists",
+        "details": {
+          "type": "Microsoft.Sql/servers/AuditingSettings",
+          "existenceCondition": {
+            "field": "Microsoft.Sql/auditingSettings.state",
+            "equals": "enabled"
+          },
+          "roleDefinitionIds": [
+            "/providers/microsoft.authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+          ],
+          "deployment": {
+            "properties": {
+              "mode": "incremental",
+              "template": {
+                "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                "contentVersion": "1.0.0.0",
+                "parameters": {
+                  "sqlServerName": {
+                    "type": "string",
+                    "metadata": {
+                      "description": "Name of the SQL server"
+                    }
+                  },
+                  "location": {
+                    "type": "string",
+                    "defaultValue": "[resourceGroup().location]",
+                    "metadata": {
+                      "description": "Location for all resources."
+                    }
+                  },
+                  "workspaceId": {
+                    "type": "string",
+                    "metadata": {
+                      "description": "Log AnalyticsID"
+                    }
+                  }
+                },
+                "variables": {
+                  "diagnosticSettingsName": "SQLSecurityAuditEvents_3d229c42-c7e7-4c97-9a99-ec0d0d8b86c1"
+                },
+                "resources": [
+                  {
+                    "type": "microsoft.sql/servers/databases/providers/diagnosticSettings",
+                    "name": "[concat(parameters('sqlServerName'),'/master/microsoft.insights/',variables('diagnosticSettingsName'))]",
+                    "apiVersion": "2017-05-01-preview",
+                    "properties": {
+                      "name": "[variables('diagnosticSettingsName')]",
+                      "workspaceId": "[parameters('workspaceId')]",
+                      "logs": [
+                        {
+                          "category": "SQLSecurityAuditEvents",
+                          "enabled": true,
+                          "retentionPolicy": {
+                            "days": 0,
+                            "enabled": false
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "apiVersion": "2017-03-01-preview",
+                    "type": "Microsoft.Sql/servers/AuditingSettings",
+                    "name": "[concat(parameters('sqlServerName'),'/Default')]",
+                    "properties": {
+                      "State": "Enabled",
+                      "auditActionsAndGroups": null,
+                      "isAzureMonitorTargetEnabled": true
+                    }
+                  }
+                ]
+              },
+              "parameters": {
+                "workspaceId": {
+                  "value": "[parameters('workspaceId')]"
+                },
+                "sqlServerName": {
+                  "value": "[field('name')]"
+                },
+                "location": {
+                  "value": "[field('location')]"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
