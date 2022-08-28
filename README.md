@@ -1,6 +1,6 @@
 # azure_policy
 
-azure policies (custom)
+Azure policies (custom)
 
 The policy have been tested and meet a specific need
 
