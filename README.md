@@ -2,7 +2,7 @@
 
 Azure policies (custom)
 
-The policy have been tested and meet a specific need
+The policies have been tested and meet specific business need
 
 The definition can be modified based on use-case
 
