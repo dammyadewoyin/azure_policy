@@ -1,0 +1,92 @@
+{
+  "mode": "All",
+  "description": "This policy sets autopatching settings to false on VM SqlIaas Extension",
+  "policyRule": {
+    "if": {
+      "allOf": [
+        {
+          "field": "type",
+          "equals": "Microsoft.Compute/virtualMachines/extensions"
+        },
+        {
+          "field": "Microsoft.Compute/virtualMachines/extensions/publisher",
+          "equals": "Microsoft.SqlServer.Management"
+        },
+        {
+          "field": "Microsoft.Compute/virtualMachines/extensions/type",
+          "equals": "SqlIaaSAgent"
+        }
+      ]
+    },
+    "then": {
+      "effect": "[parameters('effect')]",
+      "details": {
+        "roleDefinitionIds": [
+          "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+        ],
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "name": "[field('fullName')]",
+        "evaluationDelay": "AfterProvisioning",
+        "existenceCondition": {
+          "value": "[string(field('Microsoft.Compute/virtualMachines/extensions/settings'))]",
+          "contains": "{\"AutoPatchingSettings\":{\"Enable\":false}"
+        },
+        "deployment": {
+          "properties": {
+            "mode": "incremental",
+            "parameters": {
+              "ExtensionName": {
+                "value": "[field('fullName')]"
+              },
+              "location": {
+                "value": "[field('location')]"
+              }
+            },
+            "template": {
+              "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+              "contentVersion": "1.0.0.0",
+              "parameters": {
+                "ExtensionName": {
+                  "type": "string"
+                },
+                "location": {
+                  "type": "string"
+                }
+              },
+              "variables": {},
+              "resources": [
+                {
+                  "type": "Microsoft.Compute/virtualMachines/extensions",
+                  "apiVersion": "2023-07-01",
+                  "name": "[parameters('ExtensionName')]",
+                  "location": "[parameters('location')]",
+                  "properties": {
+                    "settings": {
+                      "AutoPatchingSettings": {
+                        "Enable": false
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "parameters": {
+    "effect": {
+      "type": "String",
+      "metadata": {
+        "displayName": "Effect",
+        "description": "Enable or disable the execution of the policy"
+      },
+      "allowedValues": [
+        "DeployIfNotExists",
+        "Disabled"
+      ],
+      "defaultValue": "DeployIfNotExists"
+    }
+  }
+}
