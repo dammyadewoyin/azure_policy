@@ -1,0 +1,32 @@
+{
+  "mode": "Indexed",
+  "description": "Enforce creation of resources with at least one tag. This policy does not enforce specific tag names/values",
+  "policyRule": {
+    "if": {
+      "anyOf": [
+        {
+          "value": "[empty(field('tags'))]",
+          "equals": true
+        }
+      ]
+    },
+    "then": {
+      "effect": "[parameters('Effect')]"
+    }
+  },
+  "parameters": {
+    "Effect": {
+      "type": "String",
+      "metadata": {
+        "displayName": "Effect",
+        "description": null
+      },
+      "allowedValues": [
+        "deny",
+        "audit",
+        "disabled"
+      ],
+      "defaultValue": "deny"
+    }
+  }
+}
