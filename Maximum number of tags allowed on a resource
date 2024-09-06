@@ -1,0 +1,28 @@
+{
+  "mode": "Indexed",
+  "description": "Denies resources that have more than the 5 tags"
+  "policyRule": {
+    "if": {
+      "value": "[greater(length(field('tags')), 5)]",
+      "equals": "true"
+    },
+    "then": {
+      "effect": "[parameters('Effect')]"
+    }
+  },
+  "parameters": {
+    "Effect": {
+      "type": "String",
+      "metadata": {
+        "displayName": "Effect",
+        "description": null
+      },
+      "allowedValues": [
+        "deny",
+        "audit",
+        "disabled"
+      ],
+      "defaultValue": "deny"
+    }
+  }
+}
